@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { X, Trash2, Calendar } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+
 import { useAcompanhamento } from '@/context/AcompanhamentoContext'
 
 interface ModalGerenciamentoProps {
@@ -15,8 +15,12 @@ export function ModalGerenciamento({
   isOpen,
   onClose,
 }: ModalGerenciamentoProps) {
-  const { favoritos, removerAnime } = useAcompanhamento()
-  const { data: session } = useSession()
+  
+  
+  const { favoritos, removerAnime, changeAnimeStatus } = useAcompanhamento()
+
+
+ 
 
   if (!isOpen) return null
 
@@ -30,6 +34,12 @@ export function ModalGerenciamento({
     Sáb: 'Sábado',
     Dom: 'Domingo',
   }
+
+   const statusLabels = {
+     plan_to_watch: '📌 Planejo assistir',
+     watching: '👀 Assistindo',
+     completed: '✅ Concluído',
+   }
 
   const handleRemover = (animeId: number) => {
     removerAnime(animeId)
@@ -77,7 +87,9 @@ export function ModalGerenciamento({
                 >
                   <div className="text-xs font-black text-purple-400 uppercase tracking-widest mb-3">
                     {nomesCompletos[dia]}
+                           
                   </div>
+                  
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {animesDoDia.map(anime => (
@@ -95,14 +107,47 @@ export function ModalGerenciamento({
                           />
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xs sm:text-sm font-bold text-zinc-100 truncate">
-                            {anime.title}
-                          </h4>
-                          <p className="text-[11px] text-zinc-400 truncate">
-                            {anime.studio}
-                          </p>
-                        </div>
+                       <div className="flex-1 min-w-0">
+  <h4 className="text-xs sm:text-sm font-bold text-zinc-100 truncate">
+    {anime.title}
+  </h4>
+
+  <p className="text-[11px] text-zinc-400 truncate">
+    {anime.studio}
+  </p>
+
+  <p className="text-[10px] text-purple-400 mt-1">
+    {statusLabels[
+      anime.userStatus ?? 'plan_to_watch'
+    ]}
+  </p>
+
+  <select
+    value={anime.userStatus ?? 'plan_to_watch'}
+    onChange={(e) =>
+      changeAnimeStatus(
+        anime.id,
+        e.target.value as
+          | 'watching'
+          | 'plan_to_watch'
+          | 'completed',
+      )
+    }
+    className="mt-2 w-full rounded bg-[#202024] px-2 py-1 text-[11px] text-white border border-white/10"
+  >
+    <option value="plan_to_watch">
+      Planejo assistir
+    </option>
+
+    <option value="watching">
+      Assistindo
+    </option>
+
+    <option value="completed">
+      Concluído
+    </option>
+  </select>
+</div>
 
                         <button
                           onClick={() => handleRemover(anime.id)}

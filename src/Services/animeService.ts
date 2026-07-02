@@ -51,23 +51,25 @@ export async function getAnimesSemanais(): Promise<Anime[]> {
   const data = await response.json()
 
   const todosAnimes: Anime[] = data.data.map((item: any) => {
-    const tituloDefinido = item.title_english || item.title
+    const tituloDefinido = item.title_english ?? item.title
 
     return {
       id: item.mal_id,
       title: tituloDefinido,
-      image: item.images.jpg.large_image_url,
-      score: item.score || 0,
-      episodes: item.episodes || 0,
-      studio: item.studios[0]?.name || 'Desconhecido',
-      genres: item.genres.slice(0, 3).map((g: any) => g.name.toUpperCase()),
+      image:
+        item.images?.jpg?.large_image_url ?? item.images?.jpg?.image_url ?? '',
+      score: item.score ?? 0,
+      episodes: item.episodes ?? 0,
+      studio: item.studios?.[0]?.name ?? 'Desconhecido',
+      genres:
+        item.genres?.slice(0, 3).map((g: any) => g.name.toUpperCase()) ?? [],
       diaLancamento: traduzirDia(item.broadcast?.day),
       streaming: mapearStreamingLocal(tituloDefinido, item.streaming || []),
       rawBroadcastTime: item.broadcast?.time || 'Unknown',
       status: item.status,
       // ADICIONADO: Extração da data de início da API Jikan
       // item.aired.from retorna algo como "2026-06-01T00:00:00+00:00"
-      startDate: item.aired?.from || null, 
+      startDate: item.aired?.from || null,
     }
   })
 
@@ -75,7 +77,6 @@ export async function getAnimesSemanais(): Promise<Anime[]> {
     new Map(todosAnimes.map(anime => [anime.title, anime])).values(),
   )
 }
- 
 
 function traduzirDia(dayEn: string): string {
   if (!dayEn) return 'Dom'

@@ -4,11 +4,30 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Heart, Check } from 'lucide-react'
 import { useAcompanhamento } from '@/context/AcompanhamentoContext'
+import { Anime } from '@/src/types/anime'
 
-export function AnimeDetailModal({ anime, onClose, ano, temporada }: any) {
+
+
+interface AnimeDetailModalProps {
+  anime: Anime & {
+    mal_id?: number
+  }
+  onClose: () => void
+  ano: number
+  temporada: string
+}
+
+export function AnimeDetailModal({
+  anime,
+  onClose,
+  ano,
+  temporada,
+}: AnimeDetailModalProps) {
   const { data: session } = useSession()
 
   const [fullData, setFullData] = useState(anime)
+
+  
 
   const { adicionarAnime, removerAnime, isFavorito } = useAcompanhamento()
 
@@ -19,48 +38,57 @@ export function AnimeDetailModal({ anime, onClose, ano, temporada }: any) {
     }
   }, [])
 
-  useEffect(() => {
-    async function fetchFullDetails() {
-      try {
-        const res = await fetch(
-          `https://api.jikan.moe/v4/anime/${anime.mal_id}/full`,
-        )
-        const result = await res.json()
+ useEffect(() => {
+   async function fetchFullDetails() {
+     try {
+       
 
-        // Log para verificar se o status existe na resposta da API
-        console.log('Status retornado pela API:', result.data.status)
+       const res = await fetch(
+         `https://api.jikan.moe/v4/anime/${anime.mal_id}/full`,
+       )
 
-        setFullData(result.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchFullDetails()
-  }, [anime.mal_id])
+       const result = await res.json()
 
-  const salvo = isFavorito(fullData.mal_id)
+       setFullData(result.data)
+     } catch (error) {
+       console.error(error)
+     } 
+   }
+
+   fetchFullDetails()
+ }, [anime.mal_id])
+
+  const animeId = fullData?.mal_id ?? anime.id
+
+  const salvo = isFavorito(animeId)
 
   const handleFavorito = async () => {
     const animeFormatado = {
-      id: fullData.mal_id,
+      id: animeId,
       title: fullData.title,
-      image: fullData.images.jpg.large_image_url,
-      score: fullData.score || 0,
-      episodes: fullData.episodes || 0, // Total planejado (num_episodes)
-      startDate: fullData.aired.from, // NOVA BASE DE CÁLCULO
+      image:
+        fullData.images?.jpg?.large_image_url ??
+        fullData.images?.jpg?.image_url?? '',
+      score: fullData.score ?? 0,
+      episodes: fullData.episodes ?? 0, // Total planejado (num_episodes)
+      startDate: fullData.aired?.from, // NOVA BASE DE CÁLCULO
       studio: fullData.studios?.[0]?.name || 'N/A',
       genres: fullData.genres?.map((g: any) => g.name) || [],
       diaLancamento: 'Seg',
       rawBroadcastTime: null,
-      status: fullData.status,
+      status: fullData.status ?? 'Unknown',
+      episodesWatched: 0,
+      userStatus: 'plan_to_watch',
     }
 
     if (salvo) {
-      await removerAnime(fullData.mal_id)
+      await removerAnime(animeId)
     } else {
       await adicionarAnime(animeFormatado)
     }
   }
+  
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -75,7 +103,11 @@ export function AnimeDetailModal({ anime, onClose, ano, temporada }: any) {
         <div className="flex flex-col md:flex-row max-h-[85vh]">
           <div className="md:w-1/3 p-6 shrink-0">
             <img
-              src={fullData.images.jpg.large_image_url}
+              src={
+                fullData.images?.jpg?.large_image_url ??
+                fullData.images?.jpg?.image_url ??
+                ''
+              }
               className="rounded-xl w-full shadow-lg"
               alt={fullData.title}
             />
@@ -111,7 +143,7 @@ export function AnimeDetailModal({ anime, onClose, ano, temporada }: any) {
                 {temporada.toUpperCase()} {ano}
               </span>
               <span>•</span>
-              <span>{fullData.episodes || '??'} episódios</span>
+              <span>{fullData.episodes ?? '??'} episódios</span>
               <span className="text-[#7b2cbf] font-bold">
                 {fullData.status}
               </span>

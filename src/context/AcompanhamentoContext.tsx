@@ -9,8 +9,18 @@ import { supabase } from '@/src/lib/supabase'
 
 interface AcompanhamentoContextType {
   favoritos: Anime[]
+
   adicionarAnime: (anime: Anime) => Promise<void>
+
   removerAnime: (id: number) => Promise<void>
+
+  updateAnimeProgress: (id: number, episodes: number) => Promise<void>
+
+  changeAnimeStatus: (
+    id: number,
+    newStatus: 'watching' | 'plan_to_watch' | 'completed',
+  ) => Promise<void>
+
   isFavorito: (id: number) => boolean
 }
 
@@ -55,8 +65,10 @@ export function AcompanhamentoProvider({
         diaLancamento: item.dia_lancamento,
         rawBroadcastTime: item.raw_broadcast_time,
         status: item.status,
-        // ADICIONADO: Mapeamento da data de início vinda do banco
         startDate: item.start_date,
+
+        episodesWatched: item.episodes_watched,
+        userStatus: item.user_status,
       }))
 
       setFavoritos(favoritosFormatados)
@@ -94,6 +106,9 @@ export function AcompanhamentoProvider({
       status: anime.status,
       // ADICIONADO: Salvando a data de início no banco
       start_date: anime.startDate,
+      episodes_watched: anime.episodesWatched ?? 0,
+
+      user_status: anime.userStatus ?? 'plan_to_watch',
     })
 
     if (error) {
@@ -121,6 +136,51 @@ export function AcompanhamentoProvider({
   }
 
   // =========================
+  // ATUALIZAR PROGRESSO
+  // =========================
+  const updateAnimeProgress = async (id: number, episodes: number) => {
+    setFavoritos(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, episodesWatched: episodes } : item,
+      ),
+    )
+
+    if (!session?.user?.id) return
+
+    const { error } = await supabase
+      .from('favoritos_anime')
+      .update({ episodes_watched: episodes })
+      .eq('anime_id', id)
+      .eq('user_id', session.user.id)
+
+    if (error) console.error('Erro ao atualizar progresso:', error)
+  }
+
+  // =========================
+  // MUDAR STATUS
+  // =========================
+  const changeAnimeStatus = async (
+    id: number,
+    newStatus: 'watching' | 'plan_to_watch' | 'completed',
+  ) => {
+    setFavoritos(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, userStatus: newStatus } : item,
+      ),
+    )
+
+    if (!session?.user?.id) return
+
+    const { error } = await supabase
+      .from('favoritos_anime')
+      .update({ user_status: newStatus })
+      .eq('anime_id', id)
+      .eq('user_id', session.user.id)
+
+    if (error) console.error('Erro ao atualizar status:', error)
+  }
+
+  // =========================
   // VERIFICAR FAVORITO
   // =========================
   const isFavorito = (id: number) => {
@@ -130,7 +190,9 @@ export function AcompanhamentoProvider({
   return (
     <AcompanhamentoContext.Provider
       value={{
+        changeAnimeStatus,
         favoritos,
+        updateAnimeProgress,
         adicionarAnime,
         removerAnime,
         isFavorito,

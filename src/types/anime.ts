@@ -1,13 +1,21 @@
 export interface Anime {
+  // Dados básicos
   id: number
   title: string
   image: string
   score: number
-  episodes: number // Total de episódios da obra
+  episodes: number
   studio: string
   genres: string[]
+
+  // Exibição
   diaLancamento: string
-  startDate?: string // Nova base para o cálculo
-  status?: string // Mantemos como opcional
+  rawBroadcastTime?: string
+  streaming?: string[]
+  status?: string
+
+  // Acompanhamento
   startDate?: string
+  userStatus?: 'watching' | 'plan_to_watch' | 'completed'
+  episodesWatched?: number
 }

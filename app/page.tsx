@@ -5,20 +5,34 @@ import { CalendarioSemanalVisual } from '@/src/components/Calendar/CalendarWeak'
 import { getAnimesSemanais } from '../src/Services/animeService'
 
 export default async function Home() {
-  const dadosDeAnimes = await getAnimesSemanais()
+  let dadosDeAnimes : Anime[] = []
+
+  try {
+    dadosDeAnimes = await getAnimesSemanais()
+  } catch (err) {
+    console.error('Erro ao carregar animes:', err)
+  }
+
+  if (dadosDeAnimes.length === 0) {
+    return (
+      <>
+        <HeroBanner />
+
+        <div className="py-24 text-center text-zinc-400">
+          Nenhum anime encontrado.
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
-      {/* Banner Principal */}
       <HeroBanner />
 
-      {/* Animes que passam no dia atual */}
       <SemanalVisual animesIniciais={dadosDeAnimes} />
 
-      {/* Calendário Semanal Inteligente com Filtro integrado e Modal de Gerenciamento */}
       <CalendarioSemanalVisual animesIniciais={dadosDeAnimes} />
 
-      {/* Lançamentos da Temporada Compactos */}
       <DailyReleases animes={dadosDeAnimes} />
     </>
   )

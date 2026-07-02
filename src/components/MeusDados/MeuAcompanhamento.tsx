@@ -5,11 +5,11 @@ import Image from 'next/image'
 import { Trash2, Calendar } from 'lucide-react'
 // Ajustado para o novo padrão de importação
 import { useAcompanhamento } from '@/context/AcompanhamentoContext'
-import { useSession } from 'next-auth/react'
-import { BadgeProgressoEp} from '../AnimeGrid/BadgeProgressoEp'
+
+import { BadgeProgressoEp} from '../BadgeProgresso/BadgeProgressoEp'
 export function MeuAcompanhamento() {
   const { favoritos, removerAnime } = useAcompanhamento()
-  const { data: session } = useSession()
+  
 
   const ordemDias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
   const nomesCompletos: Record<string, string> = {
