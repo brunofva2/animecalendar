@@ -1,11 +1,12 @@
-import { HeroBanner } from '../src/components/HeroBanner/HeroBanner'
-import { SemanalVisual } from '../src/components/SemanalVisual'
-import DailyReleases from '../src/components/DailyReleases/DailyReleases'
+import { HeroBanner } from '@/src/components/HeroBanner/HeroBanner'
+import { SemanalVisual } from '@/src/components/SemanalVisual'
+import DailyReleases from '@/src/components/DailyReleases/DailyReleases'
 import { CalendarioSemanalVisual } from '@/src/components/Calendar/CalendarWeak'
-import { getAnimesSemanais } from '../src/Services/animeService'
+import { getAnimesSemanais } from '@/src/Services/animeService'
+import type { Anime } from '@/types/Anime'
 
 export default async function Home() {
-  let dadosDeAnimes : Anime[] = []
+  let dadosDeAnimes: Anime[] = []
 
   try {
     dadosDeAnimes = await getAnimesSemanais()
