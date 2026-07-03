@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Heart, CalendarDays } from 'lucide-react'
-import { Anime } from '../../types/anime'
+import { Anime } from '@/src/types/anime'
 
 interface ProximoLancamentoFavoritoProps {
   favoritos: Anime[]

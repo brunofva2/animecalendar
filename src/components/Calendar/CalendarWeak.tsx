@@ -11,11 +11,11 @@ import {
   Clock,
 } from 'lucide-react'
 import Image from 'next/image'
-import { Anime } from '../../types/anime'
-import { useAcompanhamento } from '../../context/AcompanhamentoContext'
-import { ModalGerenciamento } from '../MeusDados/ModalGerenciamento'
+import { Anime } from '@../types/anime'
+import { useAcompanhamento } from '@/context/AcompanhamentoContext'
+import { ModalGerenciamento } from '@/components/MeusDados/ModalGerenciamento'
 // MODIFICADO: Importação ajustada para ler o seu arquivo Next.Fav
-import { ProximoLancamentoFavorito } from './NextFav'
+import { ProximoLancamentoFavorito } from '@/components/Calendar/NextFav'
 
 export function CalendarioSemanalVisual({
   animesIniciais,

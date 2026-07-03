@@ -6,7 +6,7 @@ import { Trash2, Calendar } from 'lucide-react'
 // Ajustado para o novo padrão de importação
 import { useAcompanhamento } from '@/context/AcompanhamentoContext'
 
-import { BadgeProgressoEp} from '../BadgeProgresso/BadgeProgressoEp'
+import { BadgeProgressoEp} from '@/components/BadgeProgresso/BadgeProgressoEp'
 export function MeuAcompanhamento() {
   const { favoritos, removerAnime } = useAcompanhamento()
   

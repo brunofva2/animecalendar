@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AnimeDetailModal } from './AnimeDetailModal'
+import { AnimeDetailModal } from '@/components/AnimeGrid/AnimeDetailModal'
 import { Anime } from '@/src/types/anime'
 
 // Tipagem ajustada para refletir a estrutura da API Jikan e a sua interface local
